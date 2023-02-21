@@ -1,0 +1,54 @@
+﻿@page "/"
+
+@using BlazorBookApp.Data;
+@using BlazorBookApp.Services.Interfaces;
+@inject IBookService bookService
+@inject IFileService fileService;
+@inject NavigationManager navigationManager
+
+<PageTitle>Index</PageTitle>
+<AuthorizeView>
+    <Authorized>
+            <h1>Blazing books</h1>
+            <div class="searchContainer">
+                <input type="search" placeholder='Search...' class='search' @bind-value="SearchText">
+                <button class="custom-btn btn-6" @onclick="SearchBooks">Search</button>
+            </div>
+            <ul class="book-cards">
+                @if (books != null)
+                {
+                    @foreach (var book in books)
+                    {
+                        <li @onclick='@(() => @navigationManager.NavigateTo($"/book/{@book.Id}"))' style="background-image: url('@fileService.GetBlob(book.Image)')">
+                            <div class="book-info">
+                                <span class="title">@book.Title</span>
+                                @book.Author
+                            </div>
+                        </li>
+                    }
+                }
+            </ul>
+    </Authorized>
+    <NotAuthorized>
+        <h1>Hello, world!</h1>
+
+        Please log in to see content!
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [CascadingParameter]
+    public string SearchText { get; set; } = String.Empty;
+    List<Book> books = new List<Book>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        books = await bookService.GetAllBooksAsync();
+    }
+
+    private async Task SearchBooks()
+    {
+        books = await bookService.SearchByString(SearchText);
+        StateHasChanged();
+    }
+}

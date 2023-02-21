@@ -1,0 +1,97 @@
+﻿@page "/addbook"
+@using Azure.Storage.Blobs;
+@using BlazorBookApp.Data;
+@using BlazorBookApp.Services.Interfaces;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+@inject IBookService bookService
+@inject IImageService imageService;
+@inject IFileService fileService;
+
+
+<div class="container">
+    <div class="column">
+<form>
+    @if (imageDataUrl != string.Empty)
+    {
+        <img src="@imageDataUrl" />
+    }
+        <br/>
+        <InputFile OnChange="OnInputFileChange" multiple />
+        <br />
+    <br/><br/>
+            <button class="custom-btn btn-6" type="reset" @onclick="(() => imageDataUrl = string.Empty)">Reset</button>
+    <br/>
+    <label>@fileState</label>
+</form>
+</div>
+    <div class="column">
+<EditForm Model="@newBook" OnValidSubmit="@AddBookToDb">
+<DataAnnotationsValidator/>
+            <div class="row bg_1">
+                <div class="col-2">
+                    <label for="title">Title</label>
+                    <br />
+                    <InputText id="title" class="effect-1" placeholder="Title" @bind-Value="newBook.Title" />
+                    <span class="focus-border"></span>
+                </div>
+                <div class="col-2">
+                    <label for="author">Author</label>
+                    <br />
+                    <InputText id="author" class="effect-1" placeholder="Author" @bind-Value="newBook.Author" />
+                    <span class="focus-border"></span>
+                </div>
+                <div class="col-1">
+                    <label for="descript">Description</label>
+                    <br />
+                    <InputTextArea id="descript" class="textAreaEffect" @bind-Value="newBook.Description" />
+                </div>
+            </div>
+    <ValidationSummary />
+    <button class="custom-btn btn-6" type="submit">Submit</button>
+
+</EditForm>
+<div>
+    <span>@result</span>
+</div>
+</div>    
+</div>
+
+
+
+<div>
+    <span>@result</span>
+</div>
+@code {
+    private Book newBook = new Book();
+    IBrowserFile file;
+
+    string result = String.Empty;
+    string imageDataUrl = String.Empty;
+    string fileState = String.Empty;
+
+
+    private async void OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        file = e.GetMultipleFiles().First();
+        var format = "image/png";
+        var resize = await file.RequestImageFileAsync(format, 180, 320);
+        var buffer = new byte[resize.Size];
+        await resize.OpenReadStream().ReadAsync(buffer);
+
+        imageDataUrl = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+        this.StateHasChanged();
+    }
+
+
+    private async Task AddBookToDb()
+    {
+        var fileDate = await imageService.UploadImage(file);
+        newBook.Image = fileDate.Name;
+        fileState = fileDate.ImageState;
+        await bookService.AddBookAsync(newBook);
+
+        result = $"Added Title {newBook.Title}";
+        newBook = new Book();        
+    }
+}

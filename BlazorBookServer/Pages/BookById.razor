@@ -1,0 +1,53 @@
+﻿@page "/book/{Id:int}"
+@using BlazorBookApp.Data;
+@using BlazorBookApp.Services.Interfaces;
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+@inject IBookService bookService
+@inject IFileService fileService;
+@inject ICommentService commentService
+@inject NavigationManager navigationManager
+
+@if(showBook == null)
+{
+    <p>Loading....</p>
+}
+else
+{
+   
+<div class="container">
+    <div class="column">
+        <img src="@fileService.GetBlob(showBook.Image)" />
+    </div>
+    <div class="column">
+         <h1><b>Title Name:</b> </h1>
+        <h1>@showBook.Title</h1>
+        <h2><b>Author:</b></h2> 
+         <h2> @showBook.Author</h2>
+        <h5><b>Description</b></h5>
+        <p>@showBook.Description</p>
+            <button class="custom-btn btn-6" type="button" @onclick='@(() => @navigationManager.NavigateTo($"/UpdateBook/{@showBook.Id}"))'>Edit</button>
+    </div>        
+</div>
+<div>
+
+</div>
+
+}
+
+
+
+
+@code {
+    private Book showBook{ get; set; }
+    [Parameter]
+    public int Id { get; set; } = 0;
+
+    private List<Comment> comments{ get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        showBook = await bookService.GetBookByIdAsync(Id);
+        comments = await commentService.GetAllCommentsByBookIdAsync(Id);
+    }
+}
