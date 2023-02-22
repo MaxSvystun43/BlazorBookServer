@@ -26,12 +26,55 @@ else
          <h2> @showBook.Author</h2>
         <h5><b>Description</b></h5>
         <p>@showBook.Description</p>
+        <h5><b>Rate of the book</b></h5>
+        <p>@GetOveralRate()</p>
             <button class="custom-btn btn-6" type="button" @onclick='@(() => @navigationManager.NavigateTo($"/UpdateBook/{@showBook.Id}"))'>Edit</button>
-    </div>        
-</div>
-<div>
 
+<div>
+<EditForm model="@newComment" OnValidSubmit="@AddCommentAsync">
+        <DataAnnotationsValidator />
+            <div class="row bg_1">
+            <div class="col-2">
+                <label for="rate">Rate</label>
+                            <InputNumber id="rate" class="effect-1" @bind-Value="@newComment.Rate" />
+            </div>
+            <div class="col-2">
+                <label for="Name" >Name</label>
+                            <InputText id="Name" class="effect-1" placeholder="Name" @bind-Value="@newComment.Name" />
+                <span class="focus-border"></span>
+            </div>
+            <div class="col-1">
+                <label for="content">Content</label>
+                <br>
+                <InputTextArea id="content" class="effect-1" @bind-Value="@newComment.Content" />
+            </div>
+            </div>
+        <ValidationSummary />
+        <button class="custom-btn btn-6" type="submit">Submit</button>
+</EditForm>
+        @if (showMessage)
+        {
+            <div>
+                @commentState
+            </div>
+        }
+ </div>
+
+<div>
+    @foreach(var comment in comments)
+    {
+        <h4>
+            <b>Name:</b> @comment.Name
+                <b>Rate:</b> @comment.Rate
+        </h4>
+        
+        <p>
+            @comment.Content
+        </p>
+    }
 </div>
+        </div>
+    </div>
 
 }
 
@@ -42,6 +85,9 @@ else
     private Book showBook{ get; set; }
     [Parameter]
     public int Id { get; set; } = 0;
+    private Comment newComment { get; set; } = new Comment();
+    private string commentState = string.Empty;
+    bool showMessage = false;
 
     private List<Comment> comments{ get; set; }
 
@@ -49,5 +95,24 @@ else
     {
         showBook = await bookService.GetBookByIdAsync(Id);
         comments = await commentService.GetAllCommentsByBookIdAsync(Id);
+    }
+
+    private async Task AddCommentAsync()
+    {
+        newComment.BookId = Id;
+        await commentService.AddCommentAsync(newComment);
+        comments.Add(newComment);
+        showMessage = true;
+
+        commentState = "Comment Added";        
+        newComment = new Comment();
+        StateHasChanged();
+        await Task.Delay(5000);
+        showMessage = false;
+    }
+
+    private double GetOveralRate()
+    {
+        return comments.Sum(x => x.Rate) / (comments.Count() != 0 ? comments.Count() : 1);
     }
 }
