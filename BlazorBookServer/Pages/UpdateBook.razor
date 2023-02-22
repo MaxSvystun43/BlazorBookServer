@@ -9,7 +9,7 @@
 
 <div class="container">
     <div class="column">
-        <img src="@fileService.GetBlob(newBook.Image)" />
+        <img src="@fileService.GetBlob(newBook.Image)" class="show-big-image" />
     </div>
     <div class="column">
         <EditForm Model="@newBook" OnValidSubmit="@UpdateBookToDb">
@@ -30,7 +30,7 @@
                 <div class="col-1">
                     <label for="descript">Description</label>
                     <br />
-                    <InputTextArea id="descript" class="textAreaEffect" @bind-Value="newBook.Description" />
+                    <InputTextArea id="descript" class="textarea-style" placeholder="Enter description" @bind-Value="newBook.Description" />
                 </div>
             </div>
             <ValidationSummary />

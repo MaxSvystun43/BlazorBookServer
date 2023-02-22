@@ -108,22 +108,31 @@ a, .btn-link {
         text-transform: uppercase;
     }
 
-.img {
+.show-image {
     border: 1px solid #ddd;
     border-radius: 4px;
     padding: 5px;
-    width: auto;
-    height: auto;
+    width: 200px;
+    height: 300px;
+}
+
+.show-big-image {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    width: 400px;
+    height: 600px;
 }
 
 
 .container {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    height:auto;
 }
 
 .column {
-    height: 300px;
+    height: auto;
 }
 
 .searchContainer {
@@ -148,7 +157,7 @@ input:focus {
 
 .col-2 {
     float: left;
-    width: 30%;
+    width: 28%;
     margin: 40px 3%;
     position: relative;
 }
@@ -291,3 +300,14 @@ button {
     .btn-6 span:hover:after {
         width: 100%;
     }
+
+.textarea-style {
+    border: thin;
+    background-color: transparent;
+    font-size: 16px;
+    padding: 10px;
+    resize: none;
+    outline: none;
+    width: 500px;
+    height: 200px;
+}

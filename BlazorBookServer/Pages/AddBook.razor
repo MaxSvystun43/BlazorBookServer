@@ -14,7 +14,7 @@
 <form>
     @if (imageDataUrl != string.Empty)
     {
-        <img src="@imageDataUrl" />
+        <img src="@imageDataUrl" class="show-image"/>
     }
         <br/>
         <InputFile OnChange="OnInputFileChange" multiple />
@@ -44,12 +44,11 @@
                 <div class="col-1">
                     <label for="descript">Description</label>
                     <br />
-                    <InputTextArea id="descript" class="textAreaEffect" @bind-Value="newBook.Description" />
+                    <InputTextArea id="descript" class="textarea-style" placeholder="Enter description" @bind-Value="newBook.Description" />
                 </div>
+                <ValidationSummary />
+               <button class="custom-btn btn-6" type="submit">Submit</button>
             </div>
-    <ValidationSummary />
-    <button class="custom-btn btn-6" type="submit">Submit</button>
-
 </EditForm>
 <div>
     <span>@result</span>
@@ -58,10 +57,6 @@
 </div>
 
 
-
-<div>
-    <span>@result</span>
-</div>
 @code {
     private Book newBook = new Book();
     IBrowserFile file;
@@ -75,9 +70,10 @@
     {
         file = e.GetMultipleFiles().First();
         var format = "image/png";
-        var resize = await file.RequestImageFileAsync(format, 180, 320);
-        var buffer = new byte[resize.Size];
-        await resize.OpenReadStream().ReadAsync(buffer);
+        var buffer = new byte[file.Size];
+        var maxSize = 1024 * 1024 * 15;
+        var fileContent = new StreamContent(file.OpenReadStream(maxSize));
+        buffer = await fileContent.ReadAsByteArrayAsync();
 
         imageDataUrl = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
         this.StateHasChanged();

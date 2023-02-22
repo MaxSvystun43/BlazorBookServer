@@ -18,7 +18,7 @@ namespace BlazorBookApp.Services
             var imageProcesing = new ImageProcesing();
             try
             {
-                var fileUpload = await ResizeImage(file, 360, 640);
+                var fileUpload = await ResizeImage(file, 400, 600);
                 imageProcesing.Name = await _fileService.UploadFile(fileUpload);
                 imageProcesing.ImageState = $"{imageProcesing.Name} file(s) uploaded on server";
                 return imageProcesing;
@@ -34,7 +34,8 @@ namespace BlazorBookApp.Services
         {
             MemoryStream stream = new MemoryStream();
             MemoryStream ms = new MemoryStream();
-            await file.OpenReadStream().CopyToAsync(stream);
+            var maxSize = 1024 * 1024 * 15;
+            await file.OpenReadStream(maxSize).CopyToAsync(stream);
             Bitmap sourceImage = new Bitmap(stream);
             using (Bitmap objBitmap = new Bitmap(width, heigth))
             {
@@ -51,7 +52,7 @@ namespace BlazorBookApp.Services
                 }
             }
             UploadedFile uploadedFile = new UploadedFile();
-            uploadedFile.FileName = file.Name;
+            uploadedFile.FileName = file.Name.Replace(" ", "-");
             uploadedFile.FileContent = ms.ToArray();
 
             return uploadedFile;

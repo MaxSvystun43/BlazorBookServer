@@ -17,7 +17,7 @@ else
    
 <div class="container">
     <div class="column">
-        <img src="@fileService.GetBlob(showBook.Image)" />
+            <img src="@fileService.GetBlob(showBook.Image)" class="show-big-image" />
     </div>
     <div class="column">
          <h1><b>Title Name:</b> </h1>
@@ -30,51 +30,50 @@ else
         <p>@GetOveralRate()</p>
             <button class="custom-btn btn-6" type="button" @onclick='@(() => @navigationManager.NavigateTo($"/UpdateBook/{@showBook.Id}"))'>Edit</button>
 
-<div>
-<EditForm model="@newComment" OnValidSubmit="@AddCommentAsync">
-        <DataAnnotationsValidator />
+    </div>
+    </div>
+    <div>
+        <div>
+        @foreach (var comment in comments)
+        {
+            <h4>
+                <b>Name:</b> @comment.Name
+                <b>Rate:</b> @comment.Rate
+            </h4>
+
+            <p>
+                @comment.Content
+            </p>
+        }
+    </div>
+        <EditForm model="@newComment" OnValidSubmit="@AddCommentAsync">
+            <DataAnnotationsValidator />
             <div class="row bg_1">
-            <div class="col-2">
-                <label for="rate">Rate</label>
-                            <InputNumber id="rate" class="effect-1" @bind-Value="@newComment.Rate" />
+                <div class="col-2">
+                    <label for="rate">Rate</label>
+                    <InputNumber id="rate" class="effect-1" @bind-Value="@newComment.Rate" />
+                </div>
+                <div class="col-2">
+                    <label for="Name">Name</label>
+                    <InputText id="Name" class="effect-1" placeholder="Name" @bind-Value="@newComment.Name" />
+                    <span class="focus-border"></span>
+                </div>
+                <div class="col-1">
+                    <label for="content">Content</label>
+                    <br>
+                    <InputTextArea id="content" class="effect-1" @bind-Value="@newComment.Content" />
+                </div>
             </div>
-            <div class="col-2">
-                <label for="Name" >Name</label>
-                            <InputText id="Name" class="effect-1" placeholder="Name" @bind-Value="@newComment.Name" />
-                <span class="focus-border"></span>
-            </div>
-            <div class="col-1">
-                <label for="content">Content</label>
-                <br>
-                <InputTextArea id="content" class="effect-1" @bind-Value="@newComment.Content" />
-            </div>
-            </div>
-        <ValidationSummary />
-        <button class="custom-btn btn-6" type="submit">Submit</button>
-</EditForm>
+            <ValidationSummary />
+            <button class="custom-btn btn-6" type="submit">Submit</button>
+        </EditForm>
         @if (showMessage)
         {
             <div>
                 @commentState
             </div>
         }
- </div>
-
-<div>
-    @foreach(var comment in comments)
-    {
-        <h4>
-            <b>Name:</b> @comment.Name
-                <b>Rate:</b> @comment.Rate
-        </h4>
-        
-        <p>
-            @comment.Content
-        </p>
-    }
-</div>
         </div>
-    </div>
 
 }
 
